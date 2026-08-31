@@ -4,8 +4,8 @@ return {
     opts = function(_, opts)
       opts.linters_by_ft = opts.linters_by_ft or {}
       opts.linters = opts.linters or {}
-      opts.linters.markdownlint = {
-        args = { "--disable", "MD013,MD041,MD033,MD045" },
+      opts.linters["markdownlint-cli2"] = {
+        args = { "--config", vim.fn.expand("~/.config/nvim/.markdownlint-cli2.jsonc"), "--" },
       }
     end,
   },
@@ -14,7 +14,7 @@ return {
     opts = function(_, opts)
       opts.formatters = opts.formatters or {}
       opts.formatters.markdownlint_cli2 = {
-        args = { "--disable", "MD013,MD041,MD033,MD045" },
+        args = { "--config", vim.fn.expand("~/.config/nvim/.markdownlint-cli2.jsonc"), "--" },
       }
     end,
   },
