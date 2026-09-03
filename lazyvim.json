@@ -5,8 +5,10 @@
     "lazyvim.plugins.extras.lang.markdown",
     "lazyvim.plugins.extras.lang.php",
     "lazyvim.plugins.extras.lang.sql",
+    "lazyvim.plugins.extras.lang.tailwind",
     "lazyvim.plugins.extras.lang.typescript",
-    "lazyvim.plugins.extras.lang.typescript.vtsls",
+    "lazyvim.plugins.extras.test.core",
+    "lazyvim.plugins.extras.dap.core",
     "lazyvim.plugins.extras.util.octo"
   ],
   "install_version": 8,
