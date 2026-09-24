@@ -36,12 +36,27 @@ function M.is_sail(root)
   return root ~= nil and vim.uv.fs_stat(root .. "/vendor/bin/sail") ~= nil
 end
 
---- Projects laid out as <project>/scripts/{php,composer,frontend} next to the
---- Laravel app, which wrap the containerised toolchain (e.g. tcms).
+--- Wrapper scripts a project ships for its (usually containerised) toolchain,
+--- looked up in <root>/scripts or <root>/../scripts (monorepo with the Laravel
+--- app in a subfolder). Returns absolute paths keyed by tool, or nil when the
+--- project has no scripts/php.
 ---@param root string?
-function M.has_scripts(root)
-  local stat = root and vim.uv.fs_stat(root .. "/../scripts")
-  return stat ~= nil and stat.type == "directory"
+---@return table<string, string>?
+function M.scripts(root)
+  if not root then
+    return nil
+  end
+  for _, dir in ipairs({ root .. "/scripts", normalize(root .. "/..") .. "/scripts" }) do
+    if vim.fn.executable(dir .. "/php") == 1 then
+      local found = {}
+      for tool, file in pairs({ php = "php", composer = "composer", npm = "frontend" }) do
+        if vim.fn.executable(dir .. "/" .. file) == 1 then
+          found[tool] = dir .. "/" .. file
+        end
+      end
+      return found
+    end
+  end
 end
 
 local function is_within(path, root)

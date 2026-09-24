@@ -80,8 +80,9 @@ return {
         end,
         before_init = function(params, config)
           local root = config.root_dir
-          if runtime.has_scripts(root) then
-            params.initializationOptions = { phpCommand = { "../scripts/php" } }
+          local scripts = runtime.scripts(root)
+          if scripts then
+            params.initializationOptions = { phpCommand = { scripts.php } }
           elseif runtime.is_sail(root) then
             params.initializationOptions = { phpEnvironment = "sail" }
           end
@@ -154,22 +155,23 @@ return {
     },
     opts = function()
       local root = runtime.root(0)
-      local default = runtime.has_scripts(root) and "tcms" or runtime.is_sail(root) and "sail" or "local"
+      local scripts = runtime.scripts(root)
+      -- laravel.nvim deep-merges options, so lists merge by index: append after
+      -- its built-in environments instead of overwriting the first one (sail).
+      local definitions = vim.deepcopy(require("laravel.options.environments").definitions)
+      if scripts then
+        local map = {}
+        for tool, path in pairs(scripts) do
+          map[tool] = { path }
+        end
+        definitions[#definitions + 1] = { name = "scripts", map = map }
+      end
       return {
         features = { pickers = { provider = "snacks" } },
         environments = {
-          default = default,
+          default = scripts and "scripts" or runtime.is_sail(root) and "sail" or "local",
           ask_on_boot = false,
-          definitions = {
-            {
-              name = "tcms",
-              map = {
-                php = { "../scripts/php" },
-                composer = { "../scripts/composer" },
-                npm = { "../scripts/frontend" },
-              },
-            },
-          },
+          definitions = definitions,
         },
         eloquent_generate_doc_blocks = true,
         extensions = {
