@@ -78,7 +78,9 @@ return {
             on_dir(root)
           end
         end,
-        init_options = { phpEnvironment = "sail" },
+        init_options = {
+          phpCommand = { "../scripts/php" },
+        },
       }
     end,
   },
@@ -147,7 +149,20 @@ return {
     },
     opts = {
       features = { pickers = { provider = "snacks" } },
-      environments = { default = "sail" },
+      environments = {
+        default = "tcms",
+        ask_on_boot = false,
+        definitions = {
+          {
+            name = "tcms",
+            map = {
+              php = { "../scripts/php" },
+              composer = { "../scripts/composer" },
+              npm = { "../scripts/frontend" },
+            },
+          },
+        },
+      },
       eloquent_generate_doc_blocks = true,
       extensions = {
         completion = { enable = false },
