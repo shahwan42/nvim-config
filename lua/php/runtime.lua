@@ -36,6 +36,14 @@ function M.is_sail(root)
   return root ~= nil and vim.uv.fs_stat(root .. "/vendor/bin/sail") ~= nil
 end
 
+--- Projects laid out as <project>/scripts/{php,composer,frontend} next to the
+--- Laravel app, which wrap the containerised toolchain (e.g. tcms).
+---@param root string?
+function M.has_scripts(root)
+  local stat = root and vim.uv.fs_stat(root .. "/../scripts")
+  return stat ~= nil and stat.type == "directory"
+end
+
 local function is_within(path, root)
   return path == root or path:sub(1, #root + 1) == root .. "/"
 end

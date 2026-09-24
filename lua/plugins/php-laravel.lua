@@ -78,9 +78,14 @@ return {
             on_dir(root)
           end
         end,
-        init_options = {
-          phpCommand = { "../scripts/php" },
-        },
+        before_init = function(params, config)
+          local root = config.root_dir
+          if runtime.has_scripts(root) then
+            params.initializationOptions = { phpCommand = { "../scripts/php" } }
+          elseif runtime.is_sail(root) then
+            params.initializationOptions = { phpEnvironment = "sail" }
+          end
+        end,
       }
     end,
   },
@@ -147,28 +152,32 @@ return {
         desc = "Laravel Resource",
       },
     },
-    opts = {
-      features = { pickers = { provider = "snacks" } },
-      environments = {
-        default = "tcms",
-        ask_on_boot = false,
-        definitions = {
-          {
-            name = "tcms",
-            map = {
-              php = { "../scripts/php" },
-              composer = { "../scripts/composer" },
-              npm = { "../scripts/frontend" },
+    opts = function()
+      local root = runtime.root(0)
+      local default = runtime.has_scripts(root) and "tcms" or runtime.is_sail(root) and "sail" or "local"
+      return {
+        features = { pickers = { provider = "snacks" } },
+        environments = {
+          default = default,
+          ask_on_boot = false,
+          definitions = {
+            {
+              name = "tcms",
+              map = {
+                php = { "../scripts/php" },
+                composer = { "../scripts/composer" },
+                npm = { "../scripts/frontend" },
+              },
             },
           },
         },
-      },
-      eloquent_generate_doc_blocks = true,
-      extensions = {
-        completion = { enable = false },
-        diagnostic = { enable = false },
-      },
-    },
+        eloquent_generate_doc_blocks = true,
+        extensions = {
+          completion = { enable = false },
+          diagnostic = { enable = false },
+        },
+      }
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter",
